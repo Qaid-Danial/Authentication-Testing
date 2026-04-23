@@ -30,8 +30,6 @@ func CreateWindow() *tview.Application {
 		output.SetText(fmt.Sprintf("Username: %s | Password: %s", username, password))
 	})
 
-	
-
 	flex := tview.NewFlex()
 	flex.SetDirection(tview.FlexRow).AddItem(nil, 0, 1, false).AddItem(
 		tview.NewFlex().AddItem(nil, 0, 1, false).AddItem(form, 50, 1, true).AddItem(nil, 0, 1, false), 10, 1, true).AddItem(output, 0, 1, false)

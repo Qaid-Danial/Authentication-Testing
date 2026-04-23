@@ -1,12 +1,13 @@
 package main
 
+import "fmt"
+
 func main() {
 
-	db := ConnectDB()
+	newWindow := CreateWindow()
 
-	// RegisterUser(db, "Danial", "0510")
-
-	ValidateUser(db, "Danial", "1005")
-
-	db.Close()
+	if err := newWindow.Run(); err != nil {
+		fmt.Println("Unable to create new window: ", err)
+		return
+	}
 }

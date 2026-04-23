@@ -33,9 +33,27 @@ func receiveMsg(w http.ResponseWriter, r *http.Request) {
 	w.Write(marshalled)
 }
 
+type Credentials struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func checkCreds(w http.ResponseWriter, r *http.Request) {
+
+	var userCred Credentials
+
+	if err := json.NewDecoder(r.Body).Decode(&userCred); err != nil {
+		http.Error(w, "Invalid Json", http.StatusBadRequest)
+		return
+	}
+
+	fmt.Printf("Username: %s | Password: %s", userCred.Username, userCred.Password)
+}
+
 func main() {
 
 	http.HandleFunc("/send", receiveMsg)
+	http.HandleFunc("/check-credentials", checkCreds)
 
 	fmt.Println("Server has started and is listening to port localhost:8080")
 	http.ListenAndServe(":8080", nil)

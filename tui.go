@@ -1,10 +1,31 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/rivo/tview"
 )
+
+
+type cred struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func MarshallingHelper(username, password string) []byte {
+	currentCred := cred{
+		Username: username,
+		Password: password,
+	}
+
+	jsonFile, err := json.Marshal(currentCred)
+	if err != nil {
+		fmt.Println("Unamble to marshal data: ", err)
+	}
+
+	return jsonFile
+}
 
 func CreateWindow() *tview.Application {
 
@@ -23,17 +44,22 @@ func CreateWindow() *tview.Application {
 		password = text
 	})
 	
-	output := tview.NewTextView()
-	output.SetBorder(true)
+	// output := tview.NewTextView()
+	// output.SetBorder(true)
 
 	form.AddButton("Input Validation", func() {
-		output.SetText(fmt.Sprintf("Username: %s | Password: %s", username, password))
+		// output.SetText(fmt.Sprintf("Username: %s | Password: %s", username, password))
+		SendCredentials(username, password)
 	})
 
 	flex := tview.NewFlex()
-	flex.SetDirection(tview.FlexRow).AddItem(nil, 0, 1, false).AddItem(
-		tview.NewFlex().AddItem(nil, 0, 1, false).AddItem(form, 50, 1, true).AddItem(nil, 0, 1, false), 10, 1, true).AddItem(output, 0, 1, false)
-
+	flex.SetDirection(tview.FlexRow)
+	flex.AddItem(nil, 0, 1, false).
+		AddItem(tview.NewFlex().
+			AddItem(nil, 0, 1, false).
+			AddItem(form, 50, 1, true).
+			AddItem(nil, 0, 1, false), 10, 1, true).
+		AddItem(nil, 0, 1, false)
 
 	app.SetRoot(flex, true)
 

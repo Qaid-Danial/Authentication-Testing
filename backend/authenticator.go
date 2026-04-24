@@ -25,18 +25,19 @@ func ConnectDB() *sql.DB{
 	return db
 }
 
-func Authenticator(db *sql.DB, username string, password string) string{
+func Authenticator(db *sql.DB, username string, password string) (result string, usertype string) {
 
 	var passwordCheck string
+	var usertypeCheck string
 
-	if err := db.QueryRow("SELECT password FROM users WHERE username=$1", username).Scan(&passwordCheck); err != nil {
-		return ("Error verifying user: " + string(err.Error()))
+	if err := db.QueryRow("SELECT password, usertype FROM users WHERE username=$1", username).Scan(&passwordCheck, &usertypeCheck); err != nil {
+		return ("Error verifying user: " + string(err.Error())), ""
 	}
 
 	if password == passwordCheck {
-		return "Sucess"
+		return "Success", usertypeCheck
 	} else {
-		return "Password is wrong"
+		return "Unsuccess", ""
 	}
 	
 }

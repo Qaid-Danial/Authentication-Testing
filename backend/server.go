@@ -33,6 +33,10 @@ func receiveMsg(w http.ResponseWriter, r *http.Request) {
 	w.Write(marshalled)
 }
 
+var (
+	db = ConnectDB()
+)
+
 type Credentials struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -47,7 +51,10 @@ func checkCreds(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("Username: %s | Password: %s", userCred.Username, userCred.Password)
+	// fmt.Printf("Username: %s | Password: %s", userCred.Username, userCred.Password)
+	resp := Authenticator(db, userCred.Username, userCred.Password)
+	fmt.Println(resp)
+
 }
 
 func main() {

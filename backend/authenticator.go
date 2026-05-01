@@ -25,19 +25,51 @@ func ConnectDB() *sql.DB{
 	return db
 }
 
-func Authenticator(db *sql.DB, username string, password string) (result string, usertype string) {
+// func Authenticator(db *sql.DB, username string, password string) (result string, usertype string) {
+
+// 	var passwordCheck string
+// 	var usertypeCheck string
+
+// 	if err := db.QueryRow("SELECT password, usertype FROM users WHERE username=$1", username).Scan(&passwordCheck, &usertypeCheck); err != nil {
+// 		return ("Error verifying user: " + string(err.Error())), ""
+// 	}
+
+// 	if password == passwordCheck {
+// 		return "Success", usertypeCheck
+// 	} else {
+// 		return "Unsuccess", ""
+// 	}
+	
+// }
+
+func Authenticator(db *sql.DB, username string, password string) DBResult {
 
 	var passwordCheck string
 	var usertypeCheck string
 
 	if err := db.QueryRow("SELECT password, usertype FROM users WHERE username=$1", username).Scan(&passwordCheck, &usertypeCheck); err != nil {
-		return ("Error verifying user: " + string(err.Error())), ""
+		// return ("Error verifying user: " + string(err.Error())), ""
+		return DBResult{
+			result: ("Error verifying user: " + string(err.Error())),
+			username: "",
+			usertype: "",
+		}
 	}
 
 	if password == passwordCheck {
-		return "Success", usertypeCheck
+		// return "Success", usertypeCheck
+		return DBResult{
+			result: "Success",
+			username: username,
+			usertype: usertypeCheck,
+		}
 	} else {
-		return "Unsuccess", ""
+		// return "Unsuccess", ""
+		return DBResult{
+			result: "Unsuccess",
+			username: username,
+			usertype: "",
+		}
 	}
 	
 }

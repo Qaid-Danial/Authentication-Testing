@@ -15,9 +15,10 @@ type Credentials struct {
 type Result struct {
 	Result string `json:"result"`
 	Usertype  string `json:"usertype"`
+	Token string `json:"token"`
 }
 
-func CheckCredentials(username string, password string) (result string, usertype string) {
+func CheckCredentials(username string, password string) (result string, usertype string, token string) {
 
 	cred := Credentials{
 		Username: username,
@@ -30,7 +31,7 @@ func CheckCredentials(username string, password string) (result string, usertype
 	}
 
 	resp, err := http.Post(
-		"http://localhost:8080/check-credentials",
+		"https://go.silly-danial.lol/check-credentials",
 		"application/json",
 		bytes.NewBuffer(marshalled),
 	)
@@ -47,5 +48,6 @@ func CheckCredentials(username string, password string) (result string, usertype
 		return
 	}
 
-	return res.Result, res.Usertype
+	return res.Result, res.Usertype, res.Token
 }
+

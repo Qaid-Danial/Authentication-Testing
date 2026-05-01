@@ -2,7 +2,9 @@ package clientinterface
 
 import "github.com/rivo/tview"
 
-func CreateWindow() *tview.Application {
+func CreateWindow() (*tview.Application, string) {
+
+	var tokenHousing string
 
 	app := tview.NewApplication()
 
@@ -10,7 +12,10 @@ func CreateWindow() *tview.Application {
 
 	LoginPage, resetCall := LoginPage(func(username string, password string) {
 
-		result, usertype := CheckCredentials(username, password)
+		result, usertype, token := CheckCredentials(username, password)
+
+		tokenHousing = token
+
 		if result == "Success" {
 			switch usertype{
 			case "typeone":
@@ -35,5 +40,5 @@ func CreateWindow() *tview.Application {
 	app.SetRoot(pages, true)
 	app.EnableMouse(true)
 
-	return app
+	return app, tokenHousing
 }

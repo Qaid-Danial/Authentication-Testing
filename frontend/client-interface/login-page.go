@@ -12,13 +12,6 @@ func LoginPage(SendCredentials func(username string, password string)) (tview.Pr
 
 	form := tview.NewForm()
 
-	// form.AddInputField("Username: ", "", 20, nil, func(text string) {
-	// 	username = text
-	// })
-	// form.AddInputField("Password", "", 20, nil,func(text string) {
-	// 	password = text
-	// })
-
 	usernameInput := tview.NewInputField().SetLabel("Username: ").SetFieldWidth(20)
 	passwordInput := tview.NewInputField().SetLabel("Passowrd: ").SetFieldWidth(20)
 

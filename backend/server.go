@@ -4,37 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 )
-
-// type Message struct {
-// 	TextMessage string `json:"textMessage"`
-// }
-
-// func receiveMsg(w http.ResponseWriter, r *http.Request) {
-// 	var msg Message
-
-// 	if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
-// 		http.Error(w, "Invalid Json", http.StatusBadRequest)
-// 		return
-// 	}
-
-// 	fmt.Println(msg.TextMessage)
-
-// 	reply := Message{
-// 		TextMessage: "Hey Whats Good?",
-// 	}
-
-// 	marshalled, err := json.Marshal(reply)
-// 	if err != nil {
-// 		fmt.Println("Unable to marshal message: ", err)
-// 		return
-// 	}
-
-// 	w.Write(marshalled)
-// }
 
 var (
 	db = ConnectDB()
+	jwtKey = []byte("Hella_Secure_Key_Broski")
 )
 
 type Credentials struct {
@@ -45,6 +22,13 @@ type Credentials struct {
 type Result struct {
 	Result string `json:"result"`
 	Usertype  string `json:"usertype"`
+	Token string `json:"token"`
+}
+
+type DBResult struct {
+	result string
+	username string 
+	usertype string
 }
 
 func checkCreds(w http.ResponseWriter, r *http.Request) {
@@ -58,31 +42,46 @@ func checkCreds(w http.ResponseWriter, r *http.Request) {
 
 	var respBody Result
 
-	resp, usertype := Authenticator(db, userCred.Username, userCred.Password)
+	dbRespond := Authenticator(db, userCred.Username, userCred.Password)
 	
-	if resp == "Success" {
+	if dbRespond.result == "Success" {
 
-		fmt.Printf("\nUser %s successfully logged in", userCred.Username)
+		
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"username": dbRespond.username,
+			"role": dbRespond.usertype,
+			"exp": time.Now().Add(time.Hour).Unix(),
+		})
+
+		tokenString, _ := token.SignedString(jwtKey)
+
+
+		fmt.Printf("\nUser %s successfully logged in | Token: %s", dbRespond.username, tokenString)
 
 		respBody = Result{
-			Result: resp,
-			Usertype: usertype,
+			// Result: resp,
+			// Usertype: usertype,
+			Result: dbRespond.result,
+			Usertype: dbRespond.usertype,
+			Token: tokenString,
 		}
-	} else if resp == "Unsuccess" {
+	} else if dbRespond.result == "Unsuccess" {
 
 		fmt.Printf("\nAn attempt to login on user %s was made, but unsuccessful!", userCred.Username)
 
 		respBody = Result{
-			Result: resp,
-			Usertype: usertype,
+			Result: dbRespond.result,
+			Usertype: dbRespond.usertype,
+			Token: "",
 		}
 	} else {
 
-		fmt.Println(resp)
+		fmt.Println(dbRespond.result)
 
 		respBody = Result{
 			Result: "Invalid",
-			Usertype: usertype,
+			Usertype: dbRespond.usertype,
+			Token: "",
 		}
 	}
 
@@ -97,10 +96,11 @@ func checkCreds(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	// http.HandleFunc("/send", receiveMsg)
 	http.HandleFunc("/check-credentials", checkCreds)
 
 	fmt.Println("Server has started and is listening to port localhost:8080")
 	http.ListenAndServe(":8080", nil)
+
+	
 
 }
